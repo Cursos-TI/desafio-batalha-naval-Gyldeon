@@ -40,6 +40,11 @@ int podeColocarNavio(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro], int linh
         for (int i = 0; i < tamanho; i++) {
             if (tabuleiro[linha + i][coluna] != 0) return 0; // Verifica se já está ocupado
         }
+    } else if (direcao == 'D') { // Diagonal
+        if (linha + tamanho > tamanhoTabuleiro || coluna + tamanho > tamanhoTabuleiro) return 0; // Verifica se cabe na diagonal
+        for (int i = 0; i < tamanho; i++) {
+            if (tabuleiro[linha + i][coluna + i] != 0) return 0; // Verifica se já está ocupado
+        }
     }
     return 1; // Retorna 1 se é possível colocar o navio
 }
@@ -53,29 +58,32 @@ void colocarNavio(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro], int linha, 
         for (int i = 0; i < tamanho; i++) {
             tabuleiro[linha + i][coluna] = navio; // Coloca o navio na vertical
         }
+    } else if (direcao == 'D') { // Diagonal
+        for (int i = 0; i < tamanho; i++) {
+            tabuleiro[linha + i][coluna + i] = navio; // Coloca o navio na diagonal
+        }
     }
 }
 
-void posicionarNavios(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro]) {
-    int tamanhoNavio[3] = {3, 3, 3}; // Tamanhos dos navios
-    
-    for (int i = 0; i < 3; i++) {
-        int linha, coluna;
-        char direcao;
+void posicionarNaviosPredefinidos(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro]) {
+    // Definindo os navios predefinidos, todos com tamanho 3
+    int navios[4][4] = {
+        {3, 0, 0, 'H'}, // Navio 1: Tamanho 3, Linha 0, Coluna 0, Horizontal
+        {3, 3, 3, 'V'}, // Navio 2: Tamanho 3, Linha 3, Coluna 3, Vertical
+        {3, 5, 5, 'D'}, // Navio 3: Tamanho 3, Linha 5, Coluna 5, Diagonal
+        {3, 7, 2, 'D'}  // Navio 4: Tamanho 3, Linha 7, Coluna 2, Diagonal
+    };
 
-        printf("Posicione o Navio usando H para horizontal e V para vertical:\n");
-        scanf(" %c", &direcao);
-        printf("Digite a linha (0 - 9) e a coluna (A - J):\n");
+    for (int i = 0; i < 4; i++) {
+        int tamanho = navios[i][0];
+        int linha = navios[i][1];
+        int coluna = navios[i][2];
+        char direcao = navios[i][3];
 
-        char colunaLetra;
-        scanf("%d %c", &linha, &colunaLetra);
-        coluna = colunaLetra - 'A'; // Converte letra para índice
-
-        if (podeColocarNavio(tabuleiro, linha, coluna, tamanhoNavio[i], direcao)) {
-            colocarNavio(tabuleiro, linha, coluna, tamanhoNavio[i], direcao, i + 1);
+        if (podeColocarNavio(tabuleiro, linha, coluna, tamanho, direcao)) {
+            colocarNavio(tabuleiro, linha, coluna, tamanho, direcao, i + 1);
         } else {
-            printf("Posição Inválida! Tente Novamente. \n");
-            i--; // Repete a iteração para tentar novamente
+            printf("Erro ao posicionar o navio %d! Posição inválida.\n", i + 1);
         }
     }
 }
@@ -85,17 +93,15 @@ int main() {
     // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
     // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
     // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
-
-    int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro];
-    inicializarTabuleiro(tabuleiro);
-    mostrarTabuleiro(tabuleiro);
-
-    printf("Vamos posicionar os navios!\n");
-    posicionarNavios(tabuleiro);
-
-    printf("Tabuleiro com os navios posicionados!\n");
-    mostrarTabuleiro(tabuleiro);
-
+        int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro];
+        inicializarTabuleiro(tabuleiro);
+        mostrarTabuleiro(tabuleiro);
+    
+        printf("Posicionando os navios predefinidos...\n");
+        posicionarNaviosPredefinidos(tabuleiro);
+    
+        printf("Tabuleiro final com todos os navios posicionados!\n");
+        mostrarTabuleiro(tabuleiro);
     // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
     // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
     // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
