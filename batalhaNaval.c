@@ -4,6 +4,7 @@
 // Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
 // Siga os comentários para implementar cada parte do desafio.
 int tamanhoTabuleiro = 10;
+int tabuleiro[10][10];
 
 void inicializarTabuleiro(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro]) {
     for (int i = 0; i < tamanhoTabuleiro; i++) {
@@ -29,61 +30,41 @@ void mostrarTabuleiro(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro]) {
     }
 }
 
-int podeColocarNavio(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro], int linha, int coluna, int tamanho, char direcao) {
-    if (direcao == 'H') {
-        if (coluna + tamanho > tamanhoTabuleiro) return 0; // Verifica se cabe na horizontal
-        for (int j = 0; j < tamanho; j++) {
-            if (tabuleiro[linha][coluna + j] != 0) return 0; // Verifica se já está ocupado
-        }
-    } else if (direcao == 'V') {
-        if (linha + tamanho > tamanhoTabuleiro) return 0; // Verifica se cabe na vertical
-        for (int i = 0; i < tamanho; i++) {
-            if (tabuleiro[linha + i][coluna] != 0) return 0; // Verifica se já está ocupado
-        }
-    } else if (direcao == 'D') { // Diagonal
-        if (linha + tamanho > tamanhoTabuleiro || coluna + tamanho > tamanhoTabuleiro) return 0; // Verifica se cabe na diagonal
-        for (int i = 0; i < tamanho; i++) {
-            if (tabuleiro[linha + i][coluna + i] != 0) return 0; // Verifica se já está ocupado
-        }
-    }
-    return 1; // Retorna 1 se é possível colocar o navio
-}
-
-void colocarNavio(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro], int linha, int coluna, int tamanho, char direcao, int navio) {
-    if (direcao == 'H') {
-        for (int j = 0; j < tamanho; j++) {
-            tabuleiro[linha][coluna + j] = navio; // Coloca o navio na horizontal
-        }
-    } else if (direcao == 'V') {
-        for (int i = 0; i < tamanho; i++) {
-            tabuleiro[linha + i][coluna] = navio; // Coloca o navio na vertical
-        }
-    } else if (direcao == 'D') { // Diagonal
-        for (int i = 0; i < tamanho; i++) {
-            tabuleiro[linha + i][coluna + i] = navio; // Coloca o navio na diagonal
+void definirHabilidadeCone(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro], int origemLinha, int origemColuna) {
+    int tamanho = 5; // Tamanho da matriz de habilidade
+    for (int i = 0; i < tamanho; i++) {
+        for (int j = -i; j <= i; j++) {
+            int linha = origemLinha + i;
+            int coluna = origemColuna + j;
+            if (linha < tamanhoTabuleiro && coluna >= 0 && coluna < tamanhoTabuleiro) {
+                tabuleiro[linha][coluna] = 5; // Marca área afetada pela habilidade
+            }
         }
     }
 }
 
-void posicionarNaviosPredefinidos(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro]) {
-    // Definindo os navios predefinidos, todos com tamanho 3
-    int navios[4][4] = {
-        {3, 0, 0, 'H'}, // Navio 1: Tamanho 3, Linha 0, Coluna 0, Horizontal
-        {3, 3, 3, 'V'}, // Navio 2: Tamanho 3, Linha 3, Coluna 3, Vertical
-        {3, 5, 5, 'D'}, // Navio 3: Tamanho 3, Linha 5, Coluna 5, Diagonal
-        {3, 7, 2, 'D'}  // Navio 4: Tamanho 3, Linha 7, Coluna 2, Diagonal
-    };
+void definirHabilidadeCruz(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro], int origemLinha, int origemColuna) {
+    int tamanho = 5; // Tamanho da matriz de habilidade
+    for (int i = 0; i < tamanho; i++) {
+        // Marca a linha e a coluna central
+        if (origemLinha < tamanhoTabuleiro && origemColuna + i < tamanhoTabuleiro) {
+            tabuleiro[origemLinha][origemColuna + i] = 5; // Horizontal
+        }
+        if (origemLinha + i < tamanhoTabuleiro && origemColuna < tamanhoTabuleiro) {
+            tabuleiro[origemLinha + i][origemColuna] = 5; // Vertical
+        }
+    }
+}
 
-    for (int i = 0; i < 4; i++) {
-        int tamanho = navios[i][0];
-        int linha = navios[i][1];
-        int coluna = navios[i][2];
-        char direcao = navios[i][3];
-
-        if (podeColocarNavio(tabuleiro, linha, coluna, tamanho, direcao)) {
-            colocarNavio(tabuleiro, linha, coluna, tamanho, direcao, i + 1);
-        } else {
-            printf("Erro ao posicionar o navio %d! Posição inválida.\n", i + 1);
+void definirHabilidadeOctaedro(int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro], int origemLinha, int origemColuna) {
+    int tamanho = 5; // Tamanho da matriz de habilidade
+    for (int i = 0; i < tamanho; i++) {
+        for (int j = -i; j <= i; j++) {
+            int linha = origemLinha + i;
+            int coluna = origemColuna + j;
+            if (linha < tamanhoTabuleiro && coluna >= 0 && coluna < tamanhoTabuleiro) {
+                tabuleiro[linha][coluna] = 5; // Marca área afetada pela habilidade
+            }
         }
     }
 }
@@ -93,15 +74,36 @@ int main() {
     // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
     // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
     // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
-        int tabuleiro[tamanhoTabuleiro][tamanhoTabuleiro];
-        inicializarTabuleiro(tabuleiro);
-        mostrarTabuleiro(tabuleiro);
+    inicializarTabuleiro(tabuleiro);
     
-        printf("Posicionando os navios predefinidos...\n");
-        posicionarNaviosPredefinidos(tabuleiro);
-    
-        printf("Tabuleiro final com todos os navios posicionados!\n");
-        mostrarTabuleiro(tabuleiro);
+    // Posicionando os navios predefinidos
+    // Navio horizontal na linha 0
+    tabuleiro[0][0] = 3; // Navio na posição (0, 0)
+    tabuleiro[0][1] = 3; // Navio na posição (0, 1)
+    tabuleiro[0][2] = 3; // Navio na posição (0, 2)
+
+    // Navio vertical na coluna 5
+    tabuleiro[1][5] = 3; // Navio na posição (1, 5)
+    tabuleiro[2][5] = 3; // Navio na posição (2, 5)
+    tabuleiro[3][5] = 3; // Navio na posição (3, 5)
+
+    // Navio diagonal
+    tabuleiro[4][7] = 3; // Navio na posição (4, 7)
+    tabuleiro[5][8] = 3; // Navio na posição (5, 8)
+    tabuleiro[6][9] = 3; // Navio na posição (6, 9)
+
+    printf("\nTabuleiro inicial\n");
+    printf("\n");
+    mostrarTabuleiro(tabuleiro);
+
+    // Definindo as habilidades
+    definirHabilidadeCone(tabuleiro, 0, 2); // Origem da habilidade Cone
+    definirHabilidadeCruz(tabuleiro, 2, 2); // Origem da habilidade Cruz
+    definirHabilidadeOctaedro(tabuleiro, 4, 2); // Origem da habilidade Octaedro
+
+    printf("\nTabuleiro pós habilidades\n");
+    printf("\n");
+    mostrarTabuleiro(tabuleiro);
     // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
     // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
     // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
